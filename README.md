@@ -1,7 +1,5 @@
-# Improved-WGAN
-WGAN-GP Implemented in Python3 with PyTorch 0.4.0
-
-I got frustrated that there weren't really any baseline implementations for the wgan-gp in PyTorch-0.4.0, much less in Python3, So here's one I made on a nice summer morning. 
+# CPPN 
+Compositional Pattern Producing Network Implemented in Python3 with PyTorch 0.4.0
 
 This should work **out of the box** with just a couple packages:
 
@@ -9,18 +7,31 @@ This should work **out of the box** with just a couple packages:
 * Scipy
 * Numpy
 
+This really has to be played with to get the full extent of the possibilities here. 
 
-It should do MNIST and CIFAR without much trouble. I'll get to working on some agnostic one which will just use the `ImageFolder` function. It seems like a lot of people just want to run these on their own images. But to do that I'll need to implement the ResNet generator from the paper, maybe for another weekend unless someone wants it right now
+If you're here at all then I assume you know what you want. 
 
-# MNIST
+Knobs to tune:
+* latent **z** distribution (uniform/normal/multimodal)
+* scaling factor on **z**
+* number of FC layers for complexity
+* number of units per FC layer for complexity
+* output resolution
+* channels in output (1 for bw, 3 for rgb)
 
-![results](images/mnist_results.png)
+I don't remember how to make these, just play around. 
 
-# CIFAR10
+![results](results/normal_z_3_2.png)
 
-![results](images/cifar_results.png)
+![results](results/sin3_1.png)
 
-## Notes
+![results](results/sin3_2.png)
+
+![results](results//test_4.png)
+
+![results](results/sin_mix_3.png)
+
+![results](results/sin_mix3_2.png)
 
 
 If you have PyTorch 0.4.1+, there is a weird bug/feature with the mean() function creating a 1-dim tensor that gets broadcasted to 0-dim. To avoid it just replace instances of `.mean()` with `.mean(0, keepdim=True)`
