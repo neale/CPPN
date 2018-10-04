@@ -27,6 +27,9 @@ I've been using this ffmpeg command to make an mp4
 
 `ffmpeg -framerate 7 -i <fn>_%d.jpg -c:v libx264 -crf 23 output.mp4`
 
+To generate a single 1080x1080 grayscale image:
+
+`python3 cppn.py --sample True --n 1 --y_dim 1080 --x_dim 1080 --scale 10 --net 32 --c_dim 1 --exp test`
 
 I don't remember how to make these, just play around. The script will generate a single image unless you specify more with `--n`
 
