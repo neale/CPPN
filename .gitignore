@@ -1,0 +1,16 @@
+*.pt
+*.json
+*.mp4
+*.pkl
+*.npy
+*.jpg
+*.png
+*.pyc
+include/
+.*.sw* 
+*.sw* 
+seq_rgb/
+seq_bw
+outputs/
+images/
+__pycache__/
