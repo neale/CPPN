@@ -19,9 +19,18 @@ Knobs to tune:
 * output resolution
 * channels in output (1 for bw, 3 for rgb)
 
-I don't remember how to make these, just play around. 
+To make all the images for a looped video
 
-![results](results/normal_z_3_2.png)
+`python3 cppn.py --walk True --y_dim 512 --x_dim 512 --scale 10 --net 32 --c_dim 1`
+
+I've been using this ffmpeg command to make an mp4
+
+`ffmpeg -framerate 7 -i <fn>_%d.jpg -c:v libx264 -crf 23 output.mp4`
+
+
+I don't remember how to make these, just play around. The script will generate a single image unless you specify more with `--n`
+
+![results](results/normal_z_3_2.png) 
 
 ![results](results/sin3_1.png)
 
@@ -33,5 +42,6 @@ I don't remember how to make these, just play around.
 
 ![results](results/sin_mix3_2.png)
 
+![results](results/video.mp4)
 
 If you have PyTorch 0.4.1+, there is a weird bug/feature with the mean() function creating a 1-dim tensor that gets broadcasted to 0-dim. To avoid it just replace instances of `.mean()` with `.mean(0, keepdim=True)`
