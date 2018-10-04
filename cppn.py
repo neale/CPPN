@@ -14,15 +14,17 @@ def load_args():
 
     parser = argparse.ArgumentParser(description='cppn-pytorch')
     parser.add_argument('--z', default=8, type=int, help='latent space width')
+    parser.add_argument('--n', default=1, type=int, help='images to generate')
     parser.add_argument('--x_dim', default=2048, type=int, help='out image width')
     parser.add_argument('--y_dim', default=2048, type=int, help='out image height')
     parser.add_argument('--scale', default=10, type=int, help='mutiplier on z')
     parser.add_argument('--c_dim', default=1, type=int, help='channels')
     parser.add_argument('--net', default=32, type=int, help='net width')
     parser.add_argument('--batch_size', default=1, type=int)
-    parser.add_argument('--exp', default='0', type=str)
-    parser.add_argument('--walk', default=False, type=bool)
-    parser.add_argument('--sample', default=False, type=bool)
+    parser.add_argument('--exp', default='0', type=str, help'output fn')
+
+    parser.add_argument('--walk', default=False, type=bool, help='interpolate')
+    parser.add_argument('--sample', default=False, type=bool, help='sample n images')
 
     args = parser.parse_args()
     return args
@@ -113,7 +115,7 @@ def latent_walk(args, z1, z2, n_frames, netG):
 def cppn(args):
     netG = init(Generator(args))
     print (netG)
-    n_images = 200
+    n_images = args.n
     zs = []
     for _ in range(n_images):
         zs.append(torch.zeros(1, args.z).uniform_(-1.0, 1.0))
