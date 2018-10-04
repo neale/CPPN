@@ -25,7 +25,7 @@ I don't remember how to make these, just play around.
 
 ![results](results/sin3_1.png)
 
-![results](results/sin3_2.png)
+![results](results/sin_2.png)
 
 ![results](results//test_4.png)
 
