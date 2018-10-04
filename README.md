@@ -18,6 +18,7 @@ Knobs to tune:
 * number of units per FC layer for complexity
 * output resolution
 * channels in output (1 for bw, 3 for rgb)
+* functions on the linear output. `tanh`, `elu`, `sin`, `cos`, etc. 
 
 To make all the images for a looped video
 
