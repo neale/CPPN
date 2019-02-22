@@ -158,16 +158,16 @@ def init(model):
 def load_networks(args):
     exp = args.exp
     netG = Generator(args)
-    path = 'mnist/'+exp+'_results/net'
-    netG, _ = utils.load_model(path+'G_{}_'.format(args.load_iter)+exp, netG, None)
+    path = 'mnist/ckpts/net'
+    netG, _ = utils.load_model(path+'G_{}.pt'.format(args.load_iter), netG, None)
     netD = Discriminator(args)
-    netD, _ = utils.load_model(path+'D_{}_'.format(args.load_iter)+exp, netD, None)
+    netD, _ = utils.load_model(path+'D_{}.pt'.format(args.load_iter), netD, None)
     if args.ae:
         netE = Encoder(args)
-        netE, _ = utils.load_model(path+'E_{}_'.format(args.load_iter)+exp, netE, None)
+        netE, _ = utils.load_model(path+'E_{}.pt'.format(args.load_iter), netE, None)
         return netG, netE
 
-    return netG#, netD
+    return netG, netD
 
 
 def run_sampler(args):
@@ -181,7 +181,10 @@ def run_sampler(args):
 def train(args):
     
     torch.manual_seed(8734)
-    exp_dir = 'mnist/mnist_lr6_z'+str(args.z)+'n'+str(args.net)+'s'+str(args.scale) 
+    utils.create_if_empty('mnist')
+    utils.create_if_empty('results')
+    utils.create_if_empty('ckpts')
+
     netG = Generator(args).cuda()
     netD = Discriminator(args).cuda()
     print (netG, netD)
@@ -237,22 +240,12 @@ def train(args):
         if iter % 200 == 0:
             val_d_costs = []
             with torch.no_grad():
-                for i, (data, target) in enumerate(mnist_test):
-                    data = data.cuda()
-                    d = netD(data)
-                    val_d_cost = -d.mean().item()
-                    val_d_costs.append(val_d_cost)
-                noise = torch.randn(args.batch_size, args.z, requires_grad=True).cuda()
-                samples = sample(args, netG, noise)
-                samples = samples.view(-1, 28, 28).cpu().data.numpy()
-                path = exp_dir+'_results/gan_sample_{}.png'.format(iter)
-                if not os.path.exists(exp_dir+'_results'):
-                    os.makedirs(exp_dir+'_results')
+                path = 'mnist/results/gan_sample_{}.png'.format(iter)
                 print ('saving sample: ', path)
-                utils.save_images(samples, path)
+                utils.save_random_sample(args, iter, sample, netG, path)
         if iter % 5000 == 0:
-            utils.save_model(exp_dir+'_results/netG_{}_{}'.format(iter, exp_dir), netG, optimG)
-            utils.save_model(exp_dir+'_results/netD_{}_{}'.format(iter, exp_dir), netD, optimD)
+            utils.save_model('mnist/ckpts/netG_{}.pt'.format(iter), netG, optimG)
+            utils.save_model('mnist_ckpts/netD_{}.pt'.format(iter), netD, optimD)
 
 if __name__ == '__main__':
 

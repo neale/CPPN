@@ -14,8 +14,6 @@ from torchvision.utils import save_image
 import ops
 import utils
 import datagen
-from mnist_gan import Discriminator
-from mnist_ae import Encoder
 
 def load_args():
 
@@ -43,20 +41,6 @@ def load_args():
 
     args = parser.parse_args()
     return args
-
-
-def load_networks(args):
-    exp = args.exp
-    netG = Generator(args)
-    netG, _ = utils.load_model(exp+'_results/netG_{}_'.format(args.load_iter)+exp, netG, None)
-    netD = Discriminator(args)
-    netD, _ = utils.load_model(exp+'_results/netD_{}_'.format(args.load_iter)+exp, netD, None)
-    if args.ae:
-        netE = Encoder(args)
-        netE, _ = utils.load_model(exp+'_results/netE_{}_'.format(args.load_iter)+exp, netE, None)
-        return netG, netE
-
-    return netG, netD
 
 
 def coordinates(args):
