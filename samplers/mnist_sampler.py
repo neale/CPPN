@@ -11,9 +11,9 @@ from torch import optim
 from torch.nn import functional as F
 from torchvision.utils import save_image
 
-import ops
-import utils
-import datagen
+from tools import ops
+from tools import utils
+from tools import datagen
 
 def load_args():
 

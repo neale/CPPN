@@ -9,9 +9,9 @@ from torch import nn
 from torch import optim
 from torch.nn import functional as F
 
-import ops
-import utils
-import datagen
+import tools.ops as ops
+import tools.utils as utils
+import tools.datagen as datagen
 import samplers.mnist_sampler as sampler
 
 
@@ -182,8 +182,8 @@ def train(args):
     
     torch.manual_seed(8734)
     utils.create_if_empty('mnist')
-    utils.create_if_empty('results')
-    utils.create_if_empty('ckpts')
+    utils.create_if_empty('mnist/results')
+    utils.create_if_empty('mnist/ckpts')
 
     netG = Generator(args).cuda()
     netD = Discriminator(args).cuda()
@@ -245,7 +245,7 @@ def train(args):
                 utils.save_random_sample(args, iter, sample, netG, path)
         if iter % 5000 == 0:
             utils.save_model('mnist/ckpts/netG_{}.pt'.format(iter), netG, optimG)
-            utils.save_model('mnist_ckpts/netD_{}.pt'.format(iter), netD, optimD)
+            utils.save_model('mnist/ckpts/netD_{}.pt'.format(iter), netD, optimD)
 
 if __name__ == '__main__':
 

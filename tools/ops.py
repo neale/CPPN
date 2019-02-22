@@ -3,7 +3,6 @@ import numpy as np
 import torch.nn.functional as F
 import torch.autograd as autograd
 
-import utils
 
 def batch_zero_grad(modules):
     for module in modules:

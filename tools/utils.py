@@ -12,6 +12,7 @@ import torch.nn.init as init
 import torch.distributions.multivariate_normal as N
 from torchvision.utils import save_image
 
+
 def sample_z(args, grad=True):
     z = torch.randn(args.batch_size, args.dim, requires_grad=grad).cuda()
     return z
@@ -71,11 +72,12 @@ def save_random_sample(args, iter, sampler, netG, path):
     if samples.dim() < 4:
         channels = 1
         out_size = int(np.sqrt(args.output))
-        samples = samples.view(-1, out_size, out_size)
+        samples = samples.view(-1, 28, 28)
     else:
         channels = samples.shape[1]
         out_size = int(np.sqrt(args.output//3))
         samples = samples.view(-1, channels, out_size, out_size)
         samples = samples.mul(0.5).add(0.5) 
     print ('saving sample: ', path)
+    print (samples.shape)
     save_image(samples, path)
