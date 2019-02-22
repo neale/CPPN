@@ -21,3 +21,8 @@ netE*
 *.avi
 *.gif
 
+# clear out vim files
+*.swn
+*.swp
+*.swo
+
