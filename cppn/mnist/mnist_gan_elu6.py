@@ -12,7 +12,7 @@ from torch.nn import functional as F
 import ops
 import utils
 import datagen
-import mnist_sample as sampler
+import samplers.mnist_sampler as sampler
 
 
 def load_args():
