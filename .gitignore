@@ -12,3 +12,11 @@ seq_bw
 outputs/
 images/
 __pycache__/
+*.png
+*.jpg
+netD*
+netG*
+*.mp4
+*.avi
+*.gif
+
