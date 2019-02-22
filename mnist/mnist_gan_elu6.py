@@ -158,12 +158,13 @@ def init(model):
 def load_networks(args):
     exp = args.exp
     netG = Generator(args)
-    netG, _ = utils.load_model(exp+'_results/netG_{}_'.format(args.load_iter)+exp, netG, None)
-    #netD = Discriminator(args)
-    #netD, _ = utils.load_model(exp+'_results/netD_{}_'.format(args.load_iter)+exp, netD, None)
+    path = 'mnist/'+exp+'_results/net'
+    netG, _ = utils.load_model(path+'G_{}_'.format(args.load_iter)+exp, netG, None)
+    netD = Discriminator(args)
+    netD, _ = utils.load_model(path+'D_{}_'.format(args.load_iter)+exp, netD, None)
     if args.ae:
         netE = Encoder(args)
-        netE, _ = utils.load_model(exp+'_results/netE_{}_'.format(args.load_iter)+exp, netE, None)
+        netE, _ = utils.load_model(path+'E_{}_'.format(args.load_iter)+exp, netE, None)
         return netG, netE
 
     return netG#, netD
@@ -180,7 +181,7 @@ def run_sampler(args):
 def train(args):
     
     torch.manual_seed(8734)
-    exp_dir = 'mnist_lr6_z'+str(args.z)+'n'+str(args.net)+'s'+str(args.scale) 
+    exp_dir = 'mnist/mnist_lr6_z'+str(args.z)+'n'+str(args.net)+'s'+str(args.scale) 
     netG = Generator(args).cuda()
     netD = Discriminator(args).cuda()
     print (netG, netD)
@@ -190,7 +191,6 @@ def train(args):
     
     mnist_train, mnist_test = datagen.load_mnist(args)
     train = inf_gen(mnist_train)
-    print ('saving reals')
     reals, _ = next(train)
     
     one = torch.tensor(1.).cuda()
@@ -248,7 +248,7 @@ def train(args):
                 path = exp_dir+'_results/gan_sample_{}.png'.format(iter)
                 if not os.path.exists(exp_dir+'_results'):
                     os.makedirs(exp_dir+'_results')
-                print ('saving gan sample: ', path)
+                print ('saving sample: ', path)
                 utils.save_images(samples, path)
         if iter % 5000 == 0:
             utils.save_model(exp_dir+'_results/netG_{}_{}'.format(iter, exp_dir), netG, optimG)
