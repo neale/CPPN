@@ -8,7 +8,7 @@ from torch import nn
 from torch import optim
 from torch.nn import functional as F
 from imageio import imwrite
-
+from torchvision.utils import save_image
 
 def load_args():
 
@@ -135,12 +135,12 @@ def cppn(args):
     if args.sample:
         zs, _ = torch.stack(zs).sort()
         for i, z in enumerate(zs):
-            img = sample(args, netG, z).cpu().detach().numpy()
+            img = sample(args, netG, z)
             if args.c_dim == 1:
                 img = img[0][0]
             else:
                 img = img[0].reshape((args.x_dim, args.y_dim, args.c_dim))
-            imwrite('{}_{}.png'.format(args.exp, i), img*255)
+            save_image(img, '{}_{}.png'.format(args.exp, i))
     
 if __name__ == '__main__':
 
