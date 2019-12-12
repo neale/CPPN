@@ -23,6 +23,7 @@ def load_args():
     parser.add_argument('--c_dim', default=1, type=int, help='channels')
     parser.add_argument('--net', default=32, type=int, help='net width')
     parser.add_argument('--batch_size', default=1, type=int)
+    parser.add_argument('--interpolation', default=10, type=int)
     parser.add_argument('--reinit', default=10, type=int, help='reinit generator every so often')
     parser.add_argument('--exp', default='.', type=str, help='output fn')
     parser.add_argument('--walk', action='store_true', help='interpolate')
@@ -124,6 +125,7 @@ def cppn(args):
         os.makedirs('trials/'+args.exp)
     else:
         print ('Exp Directory Exists, Exiting...')
+        sys.exit(0)
 
     netG = init(Generator(args))
     print (netG)
@@ -136,11 +138,12 @@ def cppn(args):
         k = 0
         for i in range(n_images):
             if i+1 not in range(n_images):
-                images = latent_walk(args, zs[i], zs[0], 50, netG)
+                images = latent_walk(args, zs[i], zs[0], args.interpolation, netG)
                 break
-            images = latent_walk(args, zs[i], zs[i+1], 50, netG)
+            images = latent_walk(args, zs[i], zs[i+1], args.interpolation, netG)
             for img in images:
-                imwrite('{}_{}.jpg'.format(args.exp, k), img)
+                image_str = 'z-{}_scale-{}_cdim-{}_net-{}'.format(args.z, args.scale, args.c_dim, args.net)
+                imwrite('trials/{}/{}_{}.jpg'.format(args.exp, image_str, k), img)
                 k += 1
             print ('walked {}/{}'.format(i+1, n_images))
 
