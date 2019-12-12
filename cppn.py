@@ -9,6 +9,8 @@ from torch import optim
 from torch.nn import functional as F
 from imageio import imwrite
 
+import json
+import tifffile
 
 def load_args():
 
@@ -21,8 +23,8 @@ def load_args():
     parser.add_argument('--c_dim', default=1, type=int, help='channels')
     parser.add_argument('--net', default=32, type=int, help='net width')
     parser.add_argument('--batch_size', default=1, type=int)
-    parser.add_argument('--exp', default='0', type=str, help='output fn')
-
+    parser.add_argument('--reinit', default=10, type=int, help='reinit generator every so often')
+    parser.add_argument('--exp', default='.', type=str, help='output fn')
     parser.add_argument('--walk', action='store_true', help='interpolate')
     parser.add_argument('--sample', action='store_true', help='sample n images')
 
@@ -113,6 +115,16 @@ def latent_walk(args, z1, z2, n_frames, netG):
 
 
 def cppn(args):
+    seed = np.random.randint(100000)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if not os.path.exists('./trials/'):
+        os.makedirs('./trials/')
+    if not os.path.exists('trials/'+args.exp):
+        os.makedirs('trials/'+args.exp)
+    else:
+        print ('Exp Directory Exists, Exiting...')
+
     netG = init(Generator(args))
     print (netG)
     n_images = args.n
@@ -135,12 +147,18 @@ def cppn(args):
     if args.sample:
         zs, _ = torch.stack(zs).sort()
         for i, z in enumerate(zs):
+            if i % args.reinit == 0 and i > 0:
+                netG = init(Generator(args))
             img = sample(args, netG, z).cpu().detach().numpy()
             if args.c_dim == 1:
                 img = img[0][0]
             else:
                 img = img[0].reshape((args.x_dim, args.y_dim, args.c_dim))
-            imwrite('{}_{}.png'.format(args.exp, i), img*255)
+            image_str = 'z-{}_scale-{}_cdim-{}_net-{}'.format(args.z, args.scale, args.c_dim, args.net)
+            metadata = dict(seed=int(seed), z_sample=str(list(z.numpy()[0])), args=image_str)
+            metadata = json.dumps(metadata)
+            tifffile.imsave('trials/{}/{}_{}.tif'.format(args.exp, image_str, i), (img*255).astype('u1'), description=metadata)
+            imwrite('trials/{}/{}_{}.png'.format(args.exp, image_str, i), img*255)
 
 if __name__ == '__main__':
 

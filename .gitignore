@@ -9,6 +9,7 @@ include/
 *.sw* 
 seq_rgb/
 seq_bw
+trials/
 outputs/
 images/
 __pycache__/
