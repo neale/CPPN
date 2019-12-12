@@ -14,13 +14,13 @@ This really has to be played with to get the full extent of the possibilities he
 If you're here at all then I assume you know what you want. 
 
 Knobs to tune:
-* latent **z** distribution (uniform/normal/multimodal)
-* scaling factor on **z**
-* number of FC layers for complexity
-* number of units per FC layer for complexity
-* output resolution
-* channels in output (1 for bw, 3 for rgb)
-* functions on the linear output. `tanh`, `elu`, `sin`, `cos`, etc. 
+* Dimensionality of uniform sampling distribution ('--z') 
+* Scaling factor on sample magnitude (--scale)
+* Generator Depth
+* Generator layer width (--net)
+* Output resolution (---x_dim, --y_dim)
+* Output hannels (1 for bw, 3 for rgb) (--c_dim)
+* Activation functions: `tanh`, `elu`, `sin`, `cos`, etc. 
 
 To make all the images for a looped video, with 10 images and 50 interpolation frames between each image"
 
