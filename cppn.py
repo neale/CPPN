@@ -23,8 +23,8 @@ def load_args():
     parser.add_argument('--batch_size', default=1, type=int)
     parser.add_argument('--exp', default='0', type=str, help='output fn')
 
-    parser.add_argument('--walk', default=False, type=bool, help='interpolate')
-    parser.add_argument('--sample', default=False, type=bool, help='sample n images')
+    parser.add_argument('--walk', action='store_true', help='interpolate')
+    parser.add_argument('--sample', action='store_true', help='sample n images')
 
     args = parser.parse_args()
     return args
@@ -111,7 +111,7 @@ def latent_walk(args, z1, z2, n_frames, netG):
     states = torch.stack(states).detach().numpy()
     return states
 
-        
+
 def cppn(args):
     netG = init(Generator(args))
     print (netG)
@@ -141,7 +141,7 @@ def cppn(args):
             else:
                 img = img[0].reshape((args.x_dim, args.y_dim, args.c_dim))
             imwrite('{}_{}.png'.format(args.exp, i), img*255)
-    
+
 if __name__ == '__main__':
 
     args = load_args()
