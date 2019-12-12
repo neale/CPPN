@@ -46,8 +46,4 @@ I don't remember how to make these, just play around. The script will generate a
 
 ![results](results/sin_mix3_2.png)
 
-![results](results/video.mp4)
-
-If you have PyTorch 0.4.1+, there is a weird bug/feature with the mean() function creating a 1-dim tensor that gets broadcasted to 0-dim. To avoid it just replace instances of `.mean()` with `.mean(0, keepdim=True)`
-
-Some of this code, specifically the coordinates function I borrowed from ![hardmaru](https://github.com/hardmaru/cppn-tensorflow). Its a good implementation, but it uses TF (which I personally find hard to parse)
+Some of this code, specifically the coordinates function I borrowed from [hardmaru](https://github.com/hardmaru/cppn-tensorflow). Its a good implementation, but it uses TF (which I personally find hard to parse)
