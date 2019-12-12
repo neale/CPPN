@@ -22,9 +22,9 @@ Knobs to tune:
 * channels in output (1 for bw, 3 for rgb)
 * functions on the linear output. `tanh`, `elu`, `sin`, `cos`, etc. 
 
-To make all the images for a looped video
+To make all the images for a looped video, with 10 images and 50 interpolation frames between each image"
 
-`python3 cppn.py --walk True --y_dim 512 --x_dim 512 --scale 10 --net 32 --c_dim 1`
+`python3 cppn.py --walk --y_dim 512 --x_dim 512 --scale 10 --net 32 --c_dim 1 --n 10 --interpolation 50`
 
 I've been using this ffmpeg command to make an mp4
 
