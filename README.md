@@ -3,9 +3,11 @@ Compositional Pattern Producing Network Implemented in Python3 with PyTorch 0.4.
 
 This should work **out of the box** with just a couple packages:
 
-* PyTorch 0.4.0
+* PyTorch 0.4.0+ (1.0+ tested)
 * Scipy
 * Numpy
+* Imageio
+* Tifffile
 
 This really has to be played with to get the full extent of the possibilities here. 
 
@@ -32,7 +34,12 @@ To generate a single 1080x1080 grayscale image:
 
 `python3 cppn.py --sample True --n 1 --y_dim 1080 --x_dim 1080 --scale 10 --net 32 --c_dim 1 --exp test`
 
-I don't remember how to make these, just play around. The script will generate a single image unless you specify more with `--n`
+### Metadata Retrieval
+
+Each image is saved in pairs, with both a lightweight png and a tiff file for each generated image. The tiff file has metadata corresponding to the random seed (torch and numpy) and the noise sample (z) used to generate the image. These are useful for reproduction. In this way we can generate hundreds of small images quickly, and choose which ones we want to regenerate in higher resolution. 
+
+
+### Results 
 
 ![results](results/normal_z_3_2.png) 
 
