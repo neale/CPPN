@@ -32,12 +32,23 @@ I've been using this ffmpeg command to make an mp4
 
 To generate a single 1080x1080 grayscale image:
 
-`python3 cppn.py --sample True --n 1 --y_dim 1080 --x_dim 1080 --scale 10 --net 32 --c_dim 1 --exp test`
+`python3 cppn.py --sample --n 1 --y_dim 1080 --x_dim 1080 --scale 10 --net 32 --c_dim 1 --exp test`
 
-### Metadata Retrieval
+### Metadata Retrieval and Reproducing
 
 Each image is saved in pairs, with both a lightweight png and a tiff file for each generated image. The tiff file has metadata corresponding to the random seed (torch and numpy) and the noise sample (z) used to generate the image. These are useful for reproduction. In this way we can generate hundreds of small images quickly, and choose which ones we want to regenerate in higher resolution. 
 
+Say that we generated a single image with: 
+
+`python3 cppn.py --sample --n 1 --y_dim 256 --x_dim 256 --scale 10 --net 32 --c_dim 3 --exp test --name_style simple`
+
+We can reproduce this image, increasing the resolution to 1024:
+
+`python3 reproduce_images.py --file --name trials/test/image_0.tif --exp test_1024 --x_dim 1024 --y_dim 1024`
+
+We can do this in a batched mode, by upscaling every image in a given directory. 
+
+`python3 reproduce_images.py --dir --name trials/test --exp test_1024 --x_dim 1024 --y_dim 1024`
 
 ### Results 
 

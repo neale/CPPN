@@ -3,14 +3,12 @@ import sys
 import argparse
 import numpy as np
 import torch
+import tifffile
 
 from torch import nn
-from torch import optim
 from torch.nn import functional as F
 from imageio import imwrite
 
-import json
-import tifffile
 
 def load_args():
 
@@ -19,13 +17,14 @@ def load_args():
     parser.add_argument('--n', default=1, type=int, help='images to generate')
     parser.add_argument('--x_dim', default=2048, type=int, help='out image width')
     parser.add_argument('--y_dim', default=2048, type=int, help='out image height')
-    parser.add_argument('--scale', default=10, type=int, help='mutiplier on z')
+    parser.add_argument('--scale', default=10, type=float, help='mutiplier on z')
     parser.add_argument('--c_dim', default=1, type=int, help='channels')
     parser.add_argument('--net', default=32, type=int, help='net width')
     parser.add_argument('--batch_size', default=1, type=int)
     parser.add_argument('--interpolation', default=10, type=int)
     parser.add_argument('--reinit', default=10, type=int, help='reinit generator every so often')
     parser.add_argument('--exp', default='.', type=str, help='output fn')
+    parser.add_argument('--name_style', default='params', type=str, help='output fn')
     parser.add_argument('--walk', action='store_true', help='interpolate')
     parser.add_argument('--sample', action='store_true', help='sample n images')
 
@@ -121,11 +120,17 @@ def cppn(args):
     torch.manual_seed(seed)
     if not os.path.exists('./trials/'):
         os.makedirs('./trials/')
+
     if not os.path.exists('trials/'+args.exp):
         os.makedirs('trials/'+args.exp)
     else:
         print ('Exp Directory Exists, Exiting...')
         sys.exit(0)
+
+    if args.name_style == 'simple':
+        suff = 'image'
+    if args.name_style == 'params':
+        suff = 'z-{}_scale-{}_cdim-{}_net-{}'.format(args.z, args.scale, args.c_dim, args.net)
 
     netG = init(Generator(args))
     print (netG)
@@ -142,28 +147,22 @@ def cppn(args):
                 break
             images = latent_walk(args, zs[i], zs[i+1], args.interpolation, netG)
             for img in images:
-                image_str = 'z-{}_scale-{}_cdim-{}_net-{}'.format(args.z, args.scale, args.c_dim, args.net)
-                imwrite('trials/{}/{}_{}.jpg'.format(args.exp, image_str, k), img)
+                imwrite('trials/{}/{}_{}.jpg'.format(args.exp, suff, k), img)
                 k += 1
             print ('walked {}/{}'.format(i+1, n_images))
 
     if args.sample:
         zs, _ = torch.stack(zs).sort()
         for i, z in enumerate(zs):
-            if i % args.reinit == 0 and i > 0:
-                netG = init(Generator(args))
             img = sample(args, netG, z).cpu().detach().numpy()
             if args.c_dim == 1:
                 img = img[0][0]
             else:
                 img = img[0].reshape((args.x_dim, args.y_dim, args.c_dim))
-            image_str = 'z-{}_scale-{}_cdim-{}_net-{}'.format(args.z, args.scale, args.c_dim, args.net)
-            metadata = dict(seed=int(seed), z_sample=str(list(z.numpy()[0])), args=image_str)
-            metadata = json.dumps(metadata)
-            tifffile.imsave('trials/{}/{}_{}.tif'.format(args.exp, image_str, i), (img*255).astype('u1'), description=metadata)
-            imwrite('trials/{}/{}_{}.png'.format(args.exp, image_str, i), img*255)
+            metadata = dict(seed=str(seed), z_sample=str(list(z.numpy()[0])), z=str(args.z), c_dim=str(args.c_dim), scale=str(args.scale), net=str(args.net))
+            tifffile.imsave('trials/{}/{}_{}.tif'.format(args.exp, suff, i), (img*255).astype('u1'), metadata=metadata)
+            imwrite('trials/{}/{}_{}.jpg'.format(args.exp, suff, i), img*255)
 
 if __name__ == '__main__':
-
     args = load_args()
     cppn(args)
