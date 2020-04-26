@@ -65,8 +65,11 @@ def main():
         img = sample(args, netG, z).cpu().detach().numpy()
         if args.c_dim == 1:
             img = img[0][0]
-        else:
-            img = img[0].reshape((args.x_dim, args.y_dim, args.c_dim))
+        elif args.c_dim == 3:
+            if args.x_dim == args.y_dim:
+                img = img[0].reshape((args.x_dim, args.y_dim, 3))
+            else:
+                img = img[0].reshape((args.y_dim, args.x_dim, 3))
         imwrite('trials/{}/{}_{}.png'.format(args.exp, suff, idx), img*255)
 
 
