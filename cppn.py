@@ -7,7 +7,7 @@ import tifffile
 
 from torch import nn
 from torch.nn import functional as F
-from imageio import imwrite
+from imageio import imwrite, imsave
 
 
 def load_args():
@@ -48,10 +48,9 @@ class Generator(nn.Module):
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, inputs):
-        #print ('G in: ', x.shape)
         x, y, z, r = inputs
         n_points = self.x_dim * self.y_dim
-        ones = torch.ones(n_points, 1, dtype=torch.float)#.cuda()
+        ones = torch.ones(n_points, 1, dtype=torch.float)
         z_scaled = z.view(self.batch_size, 1, self.z) * ones * self.scale
         z_pt = self.linear_z(z_scaled.view(self.batch_size*n_points, self.z))
         x_pt = self.linear_x(x.view(self.batch_size*n_points, -1))
@@ -62,11 +61,10 @@ class Generator(nn.Module):
         H = F.elu(self.linear_h(H))
         H = F.softplus(self.linear_h(H))
         H = torch.tanh(self.linear_h(H))
-        #x = self.sigmoid(self.linear_out(H))
         x = .5 * torch.sin(self.linear_out(H)) + .5
-        x = x.view(self.batch_size, self.c_dim, self.y_dim, self.x_dim)
-        #print ('G out: ', x.shape)
-        return x
+        img = x.reshape(self.batch_size, self.y_dim, self.x_dim, self.c_dim)
+        #print ('G out: ', img.shape)
+        return img
 
 
 def coordinates(args):
@@ -80,9 +78,9 @@ def coordinates(args):
     x_mat = np.tile(x_mat.flatten(), args.batch_size).reshape(args.batch_size, n_points, 1)
     y_mat = np.tile(y_mat.flatten(), args.batch_size).reshape(args.batch_size, n_points, 1)
     r_mat = np.tile(r_mat.flatten(), args.batch_size).reshape(args.batch_size, n_points, 1)
-    x_mat = torch.from_numpy(x_mat).float()#.cuda()
-    y_mat = torch.from_numpy(y_mat).float()#.cuda()
-    r_mat = torch.from_numpy(r_mat).float()#.cuda()
+    x_mat = torch.from_numpy(x_mat).float()
+    y_mat = torch.from_numpy(y_mat).float()
+    r_mat = torch.from_numpy(r_mat).float()
     return x_mat, y_mat, r_mat
 
 
@@ -108,24 +106,32 @@ def latent_walk(args, z1, z2, n_frames, netG):
         if args.c_dim == 1:
             states.append(sample(args, netG, z)[0][0]*255)
         else:
-            states.append(sample(args, netG, z)[0].view(
-                args.x_dim, args.y_dim, args.c_dim)*255)
+            states.append(sample(args, netG, z)[0]*255)
     states = torch.stack(states).detach().numpy()
     return states
 
 
 def cppn(args):
-    seed = np.random.randint(100000)
+    seed = np.random.randint(123456789)
     np.random.seed(seed)
     torch.manual_seed(seed)
     if not os.path.exists('./trials/'):
         os.makedirs('./trials/')
 
-    if not os.path.exists('trials/'+args.exp):
-        os.makedirs('trials/'+args.exp)
+    subdir = args.exp
+    if not os.path.exists('trials/'+subdir):
+        os.makedirs('trials/'+subdir)
     else:
-        print ('Exp Directory Exists, Exiting...')
-        sys.exit(0)
+        while os.path.exists('trials/'+subdir):
+            response = input('Exp Directory Exists, rename (y/n/overwrite):\t')
+            if response == 'y':
+                subdir = input('New Exp Directory Name:\t')
+            elif response == 'overwrite':
+                break
+            else:
+                print ('Exiting...')
+                sys.exit(0)
+        os.makedirs('trials/'+subdir, exist_ok=True)
 
     if args.name_style == 'simple':
         suff = 'image'
@@ -146,22 +152,42 @@ def cppn(args):
                 images = latent_walk(args, zs[i], zs[0], args.interpolation, netG)
                 break
             images = latent_walk(args, zs[i], zs[i+1], args.interpolation, netG)
+            
             for img in images:
-                imwrite('trials/{}/{}_{}.jpg'.format(args.exp, suff, k), img)
+                save_fn = 'trials/{}/{}_{}'.format(subdir, suff, k)
+                print ('saving PNG image at: {}'.format(save_fn))
+                imwrite(save_fn+'.png', img)
                 k += 1
             print ('walked {}/{}'.format(i+1, n_images))
 
-    if args.sample:
+    elif args.sample:
         zs, _ = torch.stack(zs).sort()
         for i, z in enumerate(zs):
             img = sample(args, netG, z).cpu().detach().numpy()
             if args.c_dim == 1:
                 img = img[0][0]
             else:
-                img = img[0].reshape((args.x_dim, args.y_dim, args.c_dim))
-            metadata = dict(seed=str(seed), z_sample=str(list(z.numpy()[0])), z=str(args.z), c_dim=str(args.c_dim), scale=str(args.scale), net=str(args.net))
-            tifffile.imsave('trials/{}/{}_{}.tif'.format(args.exp, suff, i), (img*255).astype('u1'), metadata=metadata)
-            imwrite('trials/{}/{}_{}.jpg'.format(args.exp, suff, i), img*255)
+                img = img[0]
+            img = img * 255
+            
+            metadata = dict(seed=str(seed),
+                            z_sample=str(list(z.numpy()[0])),
+                            z=str(args.z), 
+                            c_dim=str(args.c_dim),
+                            scale=str(args.scale),
+                            net=str(args.net))
+
+            save_fn = 'trials/{}/{}_{}'.format(subdir, suff, i)
+            print ('saving TIFF/PNG image pair at: {}'.format(save_fn))
+            tifffile.imsave(save_fn+'.tif',
+                            img.astype('u1'),
+                            metadata=metadata)
+            imwrite(save_fn+'.png'.format(subdir, suff, i), img)
+    else:
+        print ('No action selected. Exiting...')
+        print ('If this is an error, check command line arguments for ' \
+                'generating images')
+        sys.exit(0)
 
 if __name__ == '__main__':
     args = load_args()

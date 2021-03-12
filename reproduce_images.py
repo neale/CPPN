@@ -47,7 +47,7 @@ def main():
     print ('Generating {} files'.format(len(files)))
 
     for idx, path in enumerate(files):
-        print (path)
+        print ('loaded file from {}'.format(path))
         with tifffile.TiffFile(path) as tif:
            img = tif.asarray()
            metadata = tif.shaped_metadata[0]
@@ -67,10 +67,13 @@ def main():
             img = img[0][0]
         elif args.c_dim == 3:
             if args.x_dim == args.y_dim:
-                img = img[0].reshape((args.x_dim, args.y_dim, 3))
+                img = img[0]
             else:
-                img = img[0].reshape((args.y_dim, args.x_dim, 3))
-        imwrite('trials/{}/{}_{}.png'.format(args.exp, suff, idx), img*255)
+                img = img[0]
+        img = img * 255
+        save_fn = 'trials/{}/{}_{}'.format(args.exp, suff, idx)
+        print ('saving PNG image at: ', save_fn)
+        imwrite(save_fn+'.png'.format(args.exp, suff, idx), img)
 
 
 if __name__ == '__main__':
