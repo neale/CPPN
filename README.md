@@ -1,9 +1,9 @@
 # CPPN 
-Compositional Pattern Producing Network Implemented in Python3 with PyTorch 0.4.0
+Compositional Pattern Producing Network Implemented in Python3 with PyTorch
 
 This should work **out of the box** with just a couple packages:
 
-* PyTorch 0.4.0+ (1.0+ tested)
+* PyTorch 1.0+, past versions may work but are untested 
 * Scipy
 * Numpy
 * Imageio
@@ -19,14 +19,14 @@ Knobs to tune:
 * Generator Depth
 * Generator layer width (--net)
 * Output resolution (---x_dim, --y_dim)
-* Output hannels (1 for bw, 3 for rgb) (--c_dim)
+* Output channels (1 for bw, 3 for RGB) (--c_dim)
 * Activation functions: `tanh`, `elu`, `sin`, `cos`, etc. 
 
 To make all the images for a looped video, with 10 images and 50 interpolation frames between each image"
 
 `python3 cppn.py --walk --y_dim 512 --x_dim 512 --scale 10 --net 32 --c_dim 1 --n 10 --interpolation 50`
 
-I've been using this ffmpeg command to make an mp4
+Use this ffmpeg command to make an mp4 from generated frames
 
 `ffmpeg -framerate 7 -i <fn>_%d.jpg -c:v libx264 -crf 23 output.mp4`
 
