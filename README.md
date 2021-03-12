@@ -50,7 +50,16 @@ We can do this in a batched mode, by upscaling every image in a given directory.
 
 `python3 reproduce_images.py --dir --name trials/test --exp test_1024 --x_dim 1024 --y_dim 1024`
 
-### Results 
+## Results 
+---
+
+### Videos
+---
+
+Some videos using CPPN and CPPN-GAN [are up on Vimeo](https://vimeo.com/user94648379). 
+
+### Images
+---
 
 ![results](results/normal_z_3_2.png) 
 
