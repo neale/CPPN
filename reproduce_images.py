@@ -8,6 +8,9 @@ from imageio import imwrite
 from cppn import sample, init, Generator
 from ast import literal_eval
 
+import logging
+logging.getLogger().setLevel(logging.ERROR)
+
 
 def load_args():
 

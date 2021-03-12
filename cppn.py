@@ -9,6 +9,10 @@ from torch import nn
 from torch.nn import functional as F
 from imageio import imwrite, imsave
 
+# Because imageio uses the root logger instead of warnings package...
+import logging
+logging.getLogger().setLevel(logging.ERROR)
+
 
 def load_args():
 
