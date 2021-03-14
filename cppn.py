@@ -169,7 +169,7 @@ def cppn(args):
         for i, z in enumerate(zs):
             img = sample(args, netG, z).cpu().detach().numpy()
             if args.c_dim == 1:
-                img = img[0][0]
+                img = img[0]
             else:
                 img = img[0]
             img = img * 255
