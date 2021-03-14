@@ -108,7 +108,7 @@ def latent_walk(args, z1, z2, n_frames, netG):
     for i in range(total_frames):
         z = z1 + delta * float(i)
         if args.c_dim == 1:
-            states.append(sample(args, netG, z)[0][0]*255)
+            states.append(sample(args, netG, z)[0]*255)
         else:
             states.append(sample(args, netG, z)[0]*255)
     states = torch.stack(states).detach().numpy()
